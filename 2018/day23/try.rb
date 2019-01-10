@@ -85,11 +85,11 @@ class Try
     max_z = resize(max(:z), scale)
     resized_bots = resize_bots(scale)
 
-    pick = pick_most_probable(
-      all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
-    )
-
     until scale == 1 do
+      pick = pick_most_probable(
+        all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
+      )
+
       scale *= 10; p ['scale', scale] # TODO
       min_x = pick[:x] *= 10
       max_x = min_x + 9
@@ -98,13 +98,11 @@ class Try
       min_z = pick[:z] *= 10
       max_z = min_z + 9
       resized_bots = resize_bots(scale)
-
-      pick = pick_most_probable(
-        all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
-      )
     end
 
-    pick
+    pick_most_probable(
+      all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
+    )
   end
 
   # Helpers
