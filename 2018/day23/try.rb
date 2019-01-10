@@ -32,25 +32,30 @@ class Try
   # Part 2
   #
 
-  def most_probable
-    pick_most_probable(all_probables)
-  end
-
   def all_probables(scale = 1)
     hash = Hash.new(0)
 
-    # min_x = min(:x) * scale
-    # max_x
-    # min_y
-    # max_y
-    # min_z
-    # max_z
+    min_x = resize(min(:x), scale)
+    max_x = resize(max(:x), scale)
+    min_y = resize(min(:y), scale)
+    max_y = resize(max(:y), scale)
+    min_z = resize(min(:z), scale)
+    max_z = resize(max(:z), scale)
 
-    (min(:x)..max(:x)).each do |x|
-      (min(:y)..max(:y)).each do |y|
-        (min(:z)..max(:z)).each do |z|
+    mini_bots = bots.map do |bot|
+      {
+        x: resize(bot[:x], scale),
+        y: resize(bot[:y], scale),
+        z: resize(bot[:z], scale),
+        r: resize(bot[:r], scale),
+      }
+    end
+
+    (min_x..max_x).each do |x|
+      (min_y..max_y).each do |y|
+        (min_z..max_z).each do |z|
           origin = { x: x, y: y, z: z }
-          bots.each do |bot|
+          mini_bots.each do |bot|
             hash[origin] += 1 if distance(origin, bot) <= bot[:r]
           end
         end
@@ -78,6 +83,16 @@ class Try
     winner
   end
 
+  def most_probable
+    scale = 0.1
+    _score, _distance, x, y, z = pick_most_probable(all_probables(scale)).values
+
+    begin
+      scale *= 10
+      p pick_most_probable(all_probables(scale))
+    end until scale == 1
+  end
+
   # Helpers
 
   def distance(origin, destination)
@@ -103,6 +118,10 @@ class Try
     @min[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
       obj[symbol] = bot[symbol] if bot[symbol] < obj[symbol]
     end[symbol]
+  end
+
+  def resize(integer, scale)
+    (integer * scale).floor
   end
 end
 
