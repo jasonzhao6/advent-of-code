@@ -1,7 +1,17 @@
 # https://adventofcode.com/2018/day/23
 
+# A relatively fast brute force solution. Part 2 takes 79s on a late 2013 MBP.
+# Speed improvement comes from solving each significant digit separately.
 class Try
+  # Configs
+  REACH = 10 + 5 # 10 covers the next digit; +5 covers rounding error from the previous digit.
+  STARTING_SCALE = 1_000_000_000.0 # Take the biggest number from input, and round up a digit.
+
+  # Constants
+  BOTH_DIRECTIONS = 2
   CENTER = { x: 0, y: 0, z: 0 }
+  FINAL_SCALE = 1
+  TEN_TIMES = 10
 
   attr_reader :filename
 
@@ -13,6 +23,7 @@ class Try
   # Part 1
   #
 
+  # Memoize all bots read from file.
   def bots
     @bots ||= File.open(filename).map do |line|
       x, y, z, r = line.scan(/-?\d+/).map(&:to_i)
@@ -20,12 +31,14 @@ class Try
     end
   end
 
+  # Find bot with largest radius.
   def strongest
     bots.each_with_object({ r: 0 }) do |bot, strongest|
       strongest.merge!(bot) if bot[:r] > strongest[:r]
     end
   end
 
+  # Given a bot, find all other bots within its radius.
   def in_range(origin)
     bots.select { |bot| distance(origin, bot) <= origin[:r] }
   end
@@ -34,6 +47,7 @@ class Try
   # Part 2
   #
 
+  # Brute force range score for every coordinate within bounds.
   def all_probables(
     min_x = min(:x),
     max_x = max(:x),
@@ -43,43 +57,46 @@ class Try
     max_z = max(:z),
     local_bots = bots
   )
-    hash = Hash.new(0)
-    # p [(min_x..max_x), (min_y..max_y), (min_z..max_z), local_bots]
+    range_scores = Hash.new(0)
 
     (min_x..max_x).each do |x|
       (min_y..max_y).each do |y|
         (min_z..max_z).each do |z|
           coordinate = { x: x, y: y, z: z }
           local_bots.each do |bot|
-            hash[coordinate] += 1 if distance(coordinate, bot) <= bot[:r]
+            bot_in_range = distance(coordinate, bot) <= bot[:r]
+            range_scores[coordinate] += 1 if bot_in_range
           end
         end
       end
     end
 
-    hash
+    range_scores
   end
 
+  # Pick out coordinate with highest score and shortest distance to CENTER.
   def pick_most_probable(probables)
-    winner = { score: 0, distance: 0 }
+    winner = { range_score: 0, distance: 0 }
 
-    probables.each do |coordinate, score|
-      higher_score = score > winner[:score]
-      same_score = score == winner[:score]
+    probables.each do |coordinate, range_score|
+      higher_range_score = range_score > winner[:range_score]
+      same_range_score = range_score == winner[:range_score]
 
       distance = distance(CENTER, coordinate)
       closer = distance < winner[:distance]
 
-      if higher_score || (same_score && closer)
-        winner.merge!(coordinate).merge!(score: score, distance: distance)
+      if higher_range_score || (same_range_score && closer)
+        winner.merge!(range_score: range_score, distance: distance)
+        winner.merge!(coordinate)
       end
     end
 
     winner
   end
 
-  def most_probable
-    scale = 10000000000000000000.0
+  # Improve brute force speed by solving each significant digit separately.
+  def most_probable_at_scale
+    scale = STARTING_SCALE
     min_x = resize(min(:x), scale)
     max_x = resize(max(:x), scale)
     min_y = resize(min(:y), scale)
@@ -88,18 +105,14 @@ class Try
     max_z = resize(max(:z), scale)
     resized_bots = resize_bots(scale)
 
-    until scale == 1 do
+    until scale == FINAL_SCALE do
       pick = pick_most_probable(
         all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
       )
 
-      scale /= 10; p ['scale', scale] # TODO
-      min_x = pick[:x] *= 10
-      max_x = min_x + 10
-      min_y = pick[:y] *= 10
-      max_y = min_y + 10
-      min_z = pick[:z] *= 10
-      max_z = min_z + 10
+      scale /= TEN_TIMES; p ['scale', scale]
+      min_x, min_y, min_z = [:x, :y, :z].map { |key| pick[key] * TEN_TIMES }
+      max_x, max_y, max_z = [min_x, min_y, min_z].map { |value| value + REACH }
       resized_bots = resize_bots(scale)
     end
 
@@ -108,8 +121,11 @@ class Try
     )
   end
 
+  #
   # Helpers
+  #
 
+  # Calculate manhattan distance between two coordinates.
   def distance(origin, destination)
     dx = (origin[:x] - destination[:x]).abs
     dy = (origin[:y] - destination[:y]).abs
@@ -117,6 +133,7 @@ class Try
     dx + dy + dz
   end
 
+  # Find max value of given symbol across all bots.
   def max(symbol)
     @max ||= {}
     return @max[symbol] if @max[symbol]
@@ -126,6 +143,7 @@ class Try
     end[symbol]
   end
 
+  # Find min value of given symbol across all bots.
   def min(symbol)
     @min ||= {}
     return @min[symbol] if @min[symbol]
@@ -135,17 +153,21 @@ class Try
     end[symbol]
   end
 
+  # Resize integer using given scale conservatively:
+  # E.g 5.5 becomes 5 to be conservative.
+  # E.g -5.5 becomes -5 to be conservative.
   def resize(integer, scale)
-    (integer / scale).floor
+    integer > 0 ? (integer / scale).floor : (integer / scale).ceil
   end
 
+  # Resize bot coordinates conservatively and radius liberally.
   def resize_bots(scale)
     bots.map do |bot|
       {
         x: resize(bot[:x], scale),
         y: resize(bot[:y], scale),
         z: resize(bot[:z], scale),
-        r: resize(bot[:r], scale),
+        r: resize(bot[:r], scale) + (scale > FINAL_SCALE ? BOTH_DIRECTIONS : 0),
       }
     end
   end
@@ -158,7 +180,7 @@ end
 # p try.in_range(try.strongest).size
 
 # Part 2
-try = Try.new('input_b2.txt')
+try = Try.new('input.txt')
 # p try.all_probables.size
 # p try.pick_most_probable(try.all_probables)
-p try.most_probable
+p try.most_probable_at_scale
