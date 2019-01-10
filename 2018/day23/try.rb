@@ -44,6 +44,7 @@ class Try
     local_bots = bots
   )
     hash = Hash.new(0)
+    # p [(min_x..max_x), (min_y..max_y), (min_z..max_z), local_bots]
 
     (min_x..max_x).each do |x|
       (min_y..max_y).each do |y|
@@ -78,7 +79,7 @@ class Try
   end
 
   def most_probable
-    scale = 0.00000001
+    scale = 10000000000000000000.0
     min_x = resize(min(:x), scale)
     max_x = resize(max(:x), scale)
     min_y = resize(min(:y), scale)
@@ -92,13 +93,13 @@ class Try
         all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
       )
 
-      scale *= 10; p ['scale', scale] # TODO
+      scale /= 10; p ['scale', scale] # TODO
       min_x = pick[:x] *= 10
-      max_x = min_x + 9
+      max_x = min_x + 10
       min_y = pick[:y] *= 10
-      max_y = min_y + 9
+      max_y = min_y + 10
       min_z = pick[:z] *= 10
-      max_z = min_z + 9
+      max_z = min_z + 10
       resized_bots = resize_bots(scale)
     end
 
@@ -135,7 +136,7 @@ class Try
   end
 
   def resize(integer, scale)
-    (integer * scale).floor
+    (integer / scale).floor
   end
 
   def resize_bots(scale)
