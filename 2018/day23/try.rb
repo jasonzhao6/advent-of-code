@@ -1,6 +1,8 @@
 # https://adventofcode.com/2018/day/23
 
 class Try
+  CENTER = { x: 0, y: 0, z: 0 }
+
   attr_reader :filename
 
   def initialize(filename)
@@ -64,7 +66,7 @@ class Try
       higher_score = score > winner[:score]
       same_score = score == winner[:score]
 
-      distance = coordinate[:x] + coordinate[:y] + coordinate[:z]
+      distance = distance(CENTER, coordinate)
       closer = distance < winner[:distance]
 
       if higher_score || (same_score && closer)
@@ -76,7 +78,7 @@ class Try
   end
 
   def most_probable
-    scale = 0.1
+    scale = 0.00000001
     min_x = resize(min(:x), scale)
     max_x = resize(max(:x), scale)
     min_y = resize(min(:y), scale)
@@ -155,7 +157,7 @@ end
 # p try.in_range(try.strongest).size
 
 # Part 2
-try = Try.new('input_b.txt')
+try = Try.new('input_b2.txt')
 # p try.all_probables.size
 # p try.pick_most_probable(try.all_probables)
 p try.most_probable
