@@ -18,30 +18,7 @@ class Try
   end
 
   def most_probable
-    hash = Hash.new(0)
-
-    (min(:x)..max(:x)).each do |x|
-      (min(:y)..max(:y)).each do |y|
-        (min(:z)..max(:z)).each do |z|
-          origin = { x: x, y: y, z: z }
-          bots.each do |bot|
-            hash[origin] += 1 if distance(origin, bot) <= bot[:r]
-          end
-        end
-      end
-    end
-
-    hash.each_with_object(score: 0, distance: 0) do |(origin, score), winner|
-      higher_score = score > winner[:score]
-      same_score = score == winner[:score]
-
-      distance = origin[:x] + origin[:y] + origin[:z]
-      closer = distance < winner[:distance]
-
-      if higher_score || (same_score && closer)
-        winner.merge!(origin).merge!(distance: distance, score: score)
-      end
-    end
+    pick_most_probable(all_probables)
   end
 
   private
@@ -76,6 +53,41 @@ class Try
     @max[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
       obj[symbol] = bot[symbol] if bot[symbol] > obj[symbol]
     end[symbol]
+  end
+
+  def all_probables
+    hash = Hash.new(0)
+
+    (min(:x)..max(:x)).each do |x|
+      (min(:y)..max(:y)).each do |y|
+        (min(:z)..max(:z)).each do |z|
+          origin = { x: x, y: y, z: z }
+          bots.each do |bot|
+            hash[origin] += 1 if distance(origin, bot) <= bot[:r]
+          end
+        end
+      end
+    end
+
+    hash
+  end
+
+  def pick_most_probable(probables)
+    winner = { score: 0, distance: 0 }
+
+    probables.each do |origin, score|
+      higher_score = score > winner[:score]
+      same_score = score == winner[:score]
+
+      distance = origin[:x] + origin[:y] + origin[:z]
+      closer = distance < winner[:distance]
+
+      if higher_score || (same_score && closer)
+        winner.merge!(origin).merge!(score: score, distance: distance)
+      end
+    end
+
+    winner
   end
 end
 
