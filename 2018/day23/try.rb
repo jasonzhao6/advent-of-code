@@ -7,6 +7,17 @@ class Try
     @filename = filename
   end
 
+  #
+  # Part 1
+  #
+
+  def bots
+    @bots ||= File.open(filename).map do |line|
+      x, y, z, r = line.scan(/-?\d+/).map(&:to_i)
+      { x: x, y: y, z: z, r: r }
+    end
+  end
+
   def strongest
     bots.each_with_object({ r: 0 }) do |bot, strongest|
       strongest.merge!(bot) if bot[:r] > strongest[:r]
@@ -17,46 +28,23 @@ class Try
     bots.select { |bot| distance(origin, bot) <= origin[:r] }
   end
 
+  #
+  # Part 2
+  #
+
   def most_probable
     pick_most_probable(all_probables)
   end
 
-  private
-
-  def bots
-    @bots ||= File.open(filename).map do |line|
-      x, y, z, r = line.scan(/-?\d+/).map(&:to_i)
-      { x: x, y: y, z: z, r: r }
-    end
-  end
-
-  def distance(origin, destination)
-    dx = (origin[:x] - destination[:x]).abs
-    dy = (origin[:y] - destination[:y]).abs
-    dz = (origin[:z] - destination[:z]).abs
-    dx + dy + dz
-  end
-
-  def min(symbol)
-    @min ||= {}
-    return @min[symbol] if @min[symbol]
-
-    @min[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
-      obj[symbol] = bot[symbol] if bot[symbol] < obj[symbol]
-    end[symbol]
-  end
-
-  def max(symbol)
-    @max ||= {}
-    return @max[symbol] if @max[symbol]
-
-    @max[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
-      obj[symbol] = bot[symbol] if bot[symbol] > obj[symbol]
-    end[symbol]
-  end
-
-  def all_probables
+  def all_probables(scale = 1)
     hash = Hash.new(0)
+
+    # min_x = min(:x) * scale
+    # max_x
+    # min_y
+    # max_y
+    # min_z
+    # max_z
 
     (min(:x)..max(:x)).each do |x|
       (min(:y)..max(:y)).each do |y|
@@ -89,11 +77,43 @@ class Try
 
     winner
   end
+
+  # Helpers
+
+  def distance(origin, destination)
+    dx = (origin[:x] - destination[:x]).abs
+    dy = (origin[:y] - destination[:y]).abs
+    dz = (origin[:z] - destination[:z]).abs
+    dx + dy + dz
+  end
+
+  def max(symbol)
+    @max ||= {}
+    return @max[symbol] if @max[symbol]
+
+    @max[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
+      obj[symbol] = bot[symbol] if bot[symbol] > obj[symbol]
+    end[symbol]
+  end
+
+  def min(symbol)
+    @min ||= {}
+    return @min[symbol] if @min[symbol]
+
+    @min[symbol] = bots.each_with_object({ symbol => 0 }) do |bot, obj|
+      obj[symbol] = bot[symbol] if bot[symbol] < obj[symbol]
+    end[symbol]
+  end
 end
 
 # Part 1
 # try = Try.new('input_a.txt')
+# p try.bots
+# p try.strongest
 # p try.in_range(try.strongest).size
 
+# Part 2
 try = Try.new('input_b.txt')
+# p try.all_probables.size
+# p try.pick_most_probable(try.all_probables)
 p try.most_probable
