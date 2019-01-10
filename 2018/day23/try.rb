@@ -32,31 +32,23 @@ class Try
   # Part 2
   #
 
-  def all_probables(scale = 1)
+  def all_probables(
+    min_x = min(:x),
+    max_x = max(:x),
+    min_y = min(:y),
+    max_y = max(:y),
+    min_z = min(:z),
+    max_z = max(:z),
+    local_bots = bots
+  )
     hash = Hash.new(0)
-
-    min_x = resize(min(:x), scale)
-    max_x = resize(max(:x), scale)
-    min_y = resize(min(:y), scale)
-    max_y = resize(max(:y), scale)
-    min_z = resize(min(:z), scale)
-    max_z = resize(max(:z), scale)
-
-    mini_bots = bots.map do |bot|
-      {
-        x: resize(bot[:x], scale),
-        y: resize(bot[:y], scale),
-        z: resize(bot[:z], scale),
-        r: resize(bot[:r], scale),
-      }
-    end
 
     (min_x..max_x).each do |x|
       (min_y..max_y).each do |y|
         (min_z..max_z).each do |z|
-          origin = { x: x, y: y, z: z }
-          mini_bots.each do |bot|
-            hash[origin] += 1 if distance(origin, bot) <= bot[:r]
+          coordinate = { x: x, y: y, z: z }
+          local_bots.each do |bot|
+            hash[coordinate] += 1 if distance(coordinate, bot) <= bot[:r]
           end
         end
       end
@@ -68,15 +60,15 @@ class Try
   def pick_most_probable(probables)
     winner = { score: 0, distance: 0 }
 
-    probables.each do |origin, score|
+    probables.each do |coordinate, score|
       higher_score = score > winner[:score]
       same_score = score == winner[:score]
 
-      distance = origin[:x] + origin[:y] + origin[:z]
+      distance = coordinate[:x] + coordinate[:y] + coordinate[:z]
       closer = distance < winner[:distance]
 
       if higher_score || (same_score && closer)
-        winner.merge!(origin).merge!(score: score, distance: distance)
+        winner.merge!(coordinate).merge!(score: score, distance: distance)
       end
     end
 
@@ -85,12 +77,34 @@ class Try
 
   def most_probable
     scale = 0.1
-    _score, _distance, x, y, z = pick_most_probable(all_probables(scale)).values
+    min_x = resize(min(:x), scale)
+    max_x = resize(max(:x), scale)
+    min_y = resize(min(:y), scale)
+    max_y = resize(max(:y), scale)
+    min_z = resize(min(:z), scale)
+    max_z = resize(max(:z), scale)
+    resized_bots = resize_bots(scale)
 
-    begin
-      scale *= 10
-      p pick_most_probable(all_probables(scale))
-    end until scale == 1
+    pick = pick_most_probable(
+      all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
+    )
+
+    until scale == 1 do
+      scale *= 10; p ['scale', scale] # TODO
+      min_x = pick[:x] *= 10
+      max_x = min_x + 9
+      min_y = pick[:y] *= 10
+      max_y = min_y + 9
+      min_z = pick[:z] *= 10
+      max_z = min_z + 9
+      resized_bots = resize_bots(scale)
+
+      pick = pick_most_probable(
+        all_probables(min_x, max_x, min_y, max_y, min_z, max_z, resized_bots)
+      )
+    end
+
+    pick
   end
 
   # Helpers
@@ -122,6 +136,17 @@ class Try
 
   def resize(integer, scale)
     (integer * scale).floor
+  end
+
+  def resize_bots(scale)
+    bots.map do |bot|
+      {
+        x: resize(bot[:x], scale),
+        y: resize(bot[:y], scale),
+        z: resize(bot[:z], scale),
+        r: resize(bot[:r], scale),
+      }
+    end
   end
 end
 
