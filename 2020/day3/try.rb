@@ -1,7 +1,7 @@
 map = []
 
 File.open('input.txt').each do |line|
-  map << line.chomp.chars * 100
+  map << line.chomp * 100
 end
 
 #
