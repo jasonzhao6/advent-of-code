@@ -9,27 +9,21 @@ BINARY_MAP = {
 # Part 1
 #
 
-max = 0
-seat_ids = []
-
-File.open('input.txt').each do |line|
+seat_ids = File.open('input.txt').map do |line|
   binary = line.chars.map { |char| BINARY_MAP[char] }.join
 
   row = binary[0..6].to_i(2)
   col = binary[7..-1].to_i(2)
 
   seat_id = row * 8 + col
-  seat_ids << seat_id
-  max = seat_id if seat_id > max
 end
+
+p seat_ids.max
 
 #
 # Part 2
 #
 
-min = 0
-
-seat_ids.sort.each.with_index do |seat_id, index|
-  min = seat_id if index == 0
-  return p seat_id - 1 if seat_id.to_i != (index + min)
+seat_ids.sort!.each.with_index do |seat_id, index|
+  return p seat_id + 1 if (seat_id + 1) != seat_ids[index+1]
 end
