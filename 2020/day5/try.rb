@@ -11,11 +11,7 @@ BINARY_MAP = {
 
 seat_ids = File.open('input.txt').map do |line|
   binary = line.chars.map { |char| BINARY_MAP[char] }.join
-
-  row = binary[0..6].to_i(2)
-  col = binary[7..-1].to_i(2)
-
-  seat_id = row * 8 + col
+  binary.to_i(2)
 end
 
 p seat_ids.max
