@@ -2,46 +2,32 @@
 # Part 1
 #
 
-# group = []
-# count = 0
-#
-# File.open('input.txt').each do |line|
-#   if line == "\n"
-#     count += group.flatten.uniq.count
-#     group = []
-#     next
-#   end
-#
-#   group << line.chomp.chars
-# end
-#
-# p count + group.flatten.uniq.count
+file = File.open('input.txt').read
+groups = file.split("\n\n")
+counts = groups.map do |group|
+  answers = group.split("\n")
+  answers.map { |answer| answer.chars }.flatten.uniq.count
+end
+
+p counts.sum
 
 #
 # Part 2
 #
 
-group = {}
-count = 0
-total = 0
+file = File.open('input.txt').read
+groups = file.split("\n\n")
+counts = groups.map do |group|
+  hash = Hash.new(0)
 
-def tally_group(hash, num)
-  hash.values.count { |value| value == num }
-end
-
-File.open('input.txt').each do |line|
-  if line == "\n"
-    total += tally_group(group, count)
-    group = {}
-    count = 0
-    next
+  answers = group.split("\n")
+  answers.each do |answer|
+    answer.chars.each do |char|
+      hash[char] += 1
+    end
   end
 
-  line.chomp.chars.each do |char|
-    group[char] ||= 0
-    group[char] += 1
-  end
-  count += 1
+  hash.values.count { |value| value == answers.count }
 end
 
-p total += tally_group(group, count)
+p counts.sum
