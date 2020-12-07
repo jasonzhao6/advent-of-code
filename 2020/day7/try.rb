@@ -55,10 +55,8 @@ class Foo
   def look_in(bag)
     return if @index[bag].nil?
     @index[bag].each do |inner, count|
-      count.times do
-        @inner_count += 1
-        look_in(inner)
-      end
+      @inner_count += count
+      count.times { look_in(inner) }
     end
   end
 
