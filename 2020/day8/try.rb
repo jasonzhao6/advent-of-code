@@ -20,18 +20,16 @@ class Program
     instruction = @input[@pointer]
     operation = instruction[0, 3]
     number = instruction[4..-1].to_i
+    jump = 1
 
-    if operation == 'nop'
-    elsif operation == 'acc'
-      @accumulator += number
-    elsif operation == 'jmp'
-      @pointer += number
-      return :next
-    else
-      raise '!'
+    case operation
+    when 'nop'
+    when 'acc' then @accumulator += number
+    when 'jmp' then jump = number
+    else raise '!'
     end
 
-    @pointer += 1
+    @pointer += jump
     return :next
   end
 
@@ -55,12 +53,10 @@ input.each.with_index do |instruction, index|
   next if operation == 'acc'
 
   input_copy = input.dup
-  if operation == 'nop'
-    input_copy[index] = input_copy[index].gsub('nop', 'jmp')
-  elsif operation == 'jmp'
-    input_copy[index] = input_copy[index].gsub('jmp', 'nop')
-  else
-    raise '!'
+  case operation
+  when 'nop' then input_copy[index] = input_copy[index].gsub('nop', 'jmp')
+  when 'jmp' then input_copy[index] = input_copy[index].gsub('jmp', 'nop')
+  else raise '!'
   end
 
   program = Program.new(input_copy)
