@@ -1,10 +1,10 @@
 # https://adventofcode.com/2018/day/23
 
-# A relatively fast brute force solution. Part 2 takes 79s on a late 2013 MBP.
+# A relatively fast brute force solution. Part 2 takes ~2 min on an '18 13" MBP.
 # Speed improvement comes from solving each significant digit separately.
 class Try
   # Configs
-  REACH = 10 + 5 # 10 covers the next digit; +5 covers rounding error from the previous digit.
+  REACH = 10 + 5 * 2 # 10 covers the next digit; 5 * 2 covers rounding errors in both directions.
   STARTING_SCALE = 1_000_000_000.0 # Take the biggest number from input, and round up a digit.
 
   # Constants
@@ -180,7 +180,7 @@ end
 # p try.in_range(try.strongest).size
 
 # Part 2
-try = Try.new('input.txt')
+try = Try.new('angel.txt')
 # p try.all_probables.size
 # p try.pick_most_probable(try.all_probables)
 p try.most_probable_at_scale
