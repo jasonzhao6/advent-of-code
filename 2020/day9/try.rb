@@ -41,18 +41,18 @@ class Program
 
     @ptr1 = 0
     @ptr2 = 1
+    @rolling_sum = @input[@ptr1] + @input[@ptr2]
   end
 
   def run
     loop do
-      current_set = @input[@ptr1..@ptr2]
-      current_sum = current_set.sum
+      return @input[@ptr1..@ptr2].minmax.sum if @rolling_sum == @sum
 
-      return current_set.min + current_set.max if current_sum == @sum
-
-      if current_sum < @sum
+      if @rolling_sum < @sum
         @ptr2 += 1
+        @rolling_sum += @input[@ptr2]
       else
+        @rolling_sum -= @input[@ptr1]
         @ptr1 += 1
       end
     end
