@@ -51,12 +51,19 @@ class Program
   end
 
   def recurse(current)
+    # Standard setup:
     return 1 if current == 0
     return @cache[current] if @cache[current]
 
     prevs = @nums.select { |num| num >= current - 3 && num < current }
     @cache[current] = prevs.map { |prev| recurse(prev) }.sum
-    return @cache[current]
+
+    # Alternative setup:
+    # prevs = @nums.select { |num| num >= current - 3 && num < current }
+    # prevs.each { |prev| recurse(prev) unless @cache[prev] }
+    #
+    # return @cache[current] = 1 if current == 0
+    # @cache[current] = prevs.map { |prev| @cache[prev] }.sum
   end
 
   def run
