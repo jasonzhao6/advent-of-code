@@ -180,7 +180,7 @@ end
 # p try.in_range(try.strongest).size
 
 # Part 2
-try = Try.new('angel.txt')
+try = Try.new('another.txt')
 # p try.all_probables.size
 # p try.pick_most_probable(try.all_probables)
 p try.most_probable_at_scale
