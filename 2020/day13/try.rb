@@ -34,7 +34,7 @@ class Program
 
     # For each of the other buses, find the next working timestamp, then update increment like so:
     # E.g. Given (3, 7), these timestamps work: [6, 27, 48, 69]. Notice how they increment by 3 * 7.
-    ids_and_offsets[1..-1].each do |id, offset|
+    ids_and_offsets.drop(1).each do |id, offset|
       ts += inc until (ts + offset) % id == 0
       inc *= id
     end
