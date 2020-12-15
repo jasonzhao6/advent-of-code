@@ -44,7 +44,8 @@ class Program
 
     @last = @nums.last
     @dict = @nums.each.with_index.with_object({}) do |(num, i), hash|
-      hash[num] = [i]
+      next if num == @last
+      hash[num] = i
     end
   end
 
@@ -55,26 +56,12 @@ class Program
     (@nums.size...target).each do |i|
       p i if i % 1_000_000 == 0
 
-      insert(is_new(@last) ? 0 : get_gap(@last), i)
+      curr = @dict[@last].nil? ? 0 : i - 1 - @dict[@last]
+      @dict[@last] = i - 1
+      @last = curr
     end
 
     p @last
-  end
-
-  def insert(curr, i)
-    @last = curr
-    @dict[curr] ||= []
-    @dict[curr] << i
-    @dict[curr] = @dict[curr].last(2)
-  end
-
-  def get_gap(last)
-    min, max = @dict[last]
-    max - min
-  end
-
-  def is_new(last)
-    @dict[last].size == 1
   end
 end
 
