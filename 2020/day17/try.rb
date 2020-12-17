@@ -145,7 +145,7 @@ class Program
     w = 0
     @input.each.with_index do |line, y|
       line.chars.each.with_index do |char, x|
-        mset(x, y, z, w, char)
+        mset(x, y, z, w, char == '#' ? 1 : 0)
       end
     end
 
@@ -200,7 +200,7 @@ class Program
       end
     end.flatten
     all = all.compact
-    all.count { |one| one == '#' }
+    all.sum
   end
 
   def round
@@ -209,17 +209,17 @@ class Program
         (@zmin..@zmax).each do |z_|
           (@wmin..@wmax).each do |w_|
             count = nei(x_, y_, z_, w_)
-            if mget(x_, y_, z_, w_) == '#'
+            if mget(x_, y_, z_, w_) == 1
               if count == 2 || count == 3
-                mset(x_, y_, z_, w_, '#')
+                mset(x_, y_, z_, w_, 1)
               else
-                mset(x_, y_, z_, w_, '.')
+                mset(x_, y_, z_, w_, 0)
               end
             else
               if count == 3
-                mset(x_, y_, z_, w_, '#')
+                mset(x_, y_, z_, w_, 1)
               else
-                mset(x_, y_, z_, w_, '.')
+                mset(x_, y_, z_, w_, 0)
               end
             end
           end
@@ -245,7 +245,7 @@ class Program
       (@ymin..@ymax).each do |y_|
         (@zmin..@zmax).each do |z_|
           (@wmin..@wmax).each do |w_|
-            if mget(x_, y_, z_, w_) == '#'
+            if mget(x_, y_, z_, w_) == 1
               # p [x_, y_, z_, w_]
               count += 1
             end
