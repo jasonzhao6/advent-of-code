@@ -21,8 +21,8 @@
 #       end
 #     end
 #
-#     @xmax = @input[0].size
-#     @ymax = @input.count
+#     @xmax = @input[0].size - 1
+#     @ymax = @input.count - 1
 #
 #     toggle
 #   end
@@ -149,8 +149,8 @@ class Program
       end
     end
 
-    @xmax = @input[0].size
-    @ymax = @input.count
+    @xmax = @input[0].size - 1
+    @ymax = @input.count - 1
 
     toggle
   end
