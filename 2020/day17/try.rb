@@ -157,7 +157,9 @@ class Program
 
   def toggle
     @toggle = !@toggle
+  end
 
+  def expand
     @xmin -= 1
     @xmax += 1
     @ymin -= 1
@@ -204,6 +206,8 @@ class Program
   end
 
   def round
+    expand
+
     (@xmin..@xmax).each do |x_|
       (@ymin..@ymax).each do |y_|
         (@zmin..@zmax).each do |z_|
