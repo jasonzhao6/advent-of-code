@@ -14,16 +14,10 @@ require 'set'
 #
 #   def run
 #     nums = @input.map(&:to_i).sort
-#     nums.each.with_index do |num, i|
-#       if i == 0
-#         prev = 0
-#       else
-#         prev = nums[i - 1]
-#       end
-#
-#       if num - prev == 1
+#     nums.each_cons(2) do |prev, curr|
+#       if curr - prev == 1
 #         @ones += 1
-#       elsif num - prev == 3
+#       elsif curr - prev == 3
 #         @threes += 1
 #       else
 #         raise '!'
