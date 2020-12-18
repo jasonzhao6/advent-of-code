@@ -6,7 +6,7 @@ require 'set'
 
 # class Program
 #   def initialize(input)
-#     @input = input.map(&:to_i)
+#     @input = input
 #
 #     @ones = 0
 #     @threes = 0
@@ -46,7 +46,7 @@ class Program
   def initialize(input)
     @input = input.map(&:to_i)
 
-    @nums = @input.map(&:to_i).sort.unshift(0).reverse
+    @nums = @input.map(&:to_i).push(0)
     @cache = {}
   end
 
@@ -67,7 +67,7 @@ class Program
   end
 
   def run
-    p recurse(@nums.first)
+    p recurse(@nums.max)
   end
 end
 
