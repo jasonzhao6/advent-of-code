@@ -2,45 +2,54 @@ class Program
   def initialize(input)
     @input = input
 
-    @rules = []
+    @rules = {}
   end
 
   def store_rules(rules)
     rules.split("\n").each do |line|
       i, rule = line.split(': ')
-      @rules[i.to_i] = rule
+      @rules[i] = rule
     end
   end
 
-  def expand_rule(i)
-    return i if i == '|'
+  def expand_rule(rule)
+    if rule =~ /^\d+$/
+      @rules[rule] = expand_rule(@rules[rule])
 
-    i = i.to_i
-    return @rules[i][1] if @rules[i][0] == '"'
-    return @rules[i] unless @rules[i][0] =~ /\d/
+      # Part 2
+      if rule == '8'
+        @rules[rule] = "#{@rules['42']}+"
+      elsif rule == '11'
+        @rules[rule] = (1..4).map do |i|
+          "#{@rules['42']}{#{i}}#{@rules['31']}{#{i}}"
+        end.join('|').prepend('(').concat(')')
+      end
+      # Part 2 ^
 
-    @rules[i] = @rules[i].split(' ').map do |j|
-      expand_rule(j)
-    end.join
-    @rules[i] = "(#{@rules[i]})"
-
-    # Part 2
-    @rules[i] = "#{@rules[42]}+" if i == 8
-    if i == 11
-      @rules[i] = (1..4).map { |j| "(#{@rules[42]}{#{j}}#{@rules[31]}{#{j}})" }.join('|')
-      @rules[i] = "(#{@rules[i]})"
+      @rules[rule]
+    elsif rule[0] == '"'
+      rule[1]
+    elsif rule !~ /\d/
+      rule
+    elsif rule =~ /^\d+( \d+)+$/
+      rule.split(' ').map { |sub| expand_rule(sub) }.join
+    elsif rule.index('|')
+      rule.split(' | ').map { |sub| expand_rule(sub) }.join('|').prepend('(').concat(')')
+    else
+      puts rule
+      raise '!'
     end
-
-    @rules[i]
   end
 
   def run
-    store_rules(@input[0])
+    rules, lines = @input
+
+    store_rules(rules)
     rule = expand_rule('0')
     rule = /^#{rule}$/
 
     count = 0
-    @input[1].split("\n").each do |line|
+    lines.split("\n").each do |line|
       count += 1 if line =~ rule
     end
     p ['count', count]
