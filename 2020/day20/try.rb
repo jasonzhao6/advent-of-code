@@ -33,10 +33,12 @@ class Tile
   end
 
   def rotate_ccw
-    @grid = @grid.size.times.map do |i|
-      i = @grid.size - i - 1
+    y = @grid.size
+    x = @grid[0].size
 
-      @grid.map { |line| line[i] }.join
+    @grid = x.times.map do |xi|
+      xi = x - xi - 1
+      @grid.map { |line| line[xi] }.join
     end
   end
 
@@ -45,7 +47,8 @@ class Tile
   end
 
   def flip_y
-    @grid.each { |line| line.reverse! }
+    # Note: `@grid.map { |line| line.reverse! }` is not safe. It will modify `@grid.dup`.
+    @grid.map! { |line| line.reverse }
   end
 
   private
@@ -60,53 +63,38 @@ end
 
 class Monster
   def initialize
-    @monster = [
+    @input = [
+      'noop 0',
       '..................#.',
       '#....##....##....###',
       '.#..#..#..#..#..#...',
     ]
+
+    @monster = Tile.new(@input.join("\n"))
   end
 
   def all8
-    v1 = @monster.dup
-    rotate_cw
-    v2 = @monster.dup
-    rotate_cw
-    v3 = @monster.dup
-    rotate_cw
-    v4 = @monster.dup
-    flip_x
-    v5 = @monster.dup
-    rotate_cw
-    v6 = @monster.dup
-    rotate_cw
-    v7 = @monster.dup
-    rotate_cw
-    v8 = @monster.dup
+    v1 = @monster.grid.dup
+    @monster.rotate_ccw
+    v2 = @monster.grid.dup
+    @monster.rotate_ccw
+    v3 = @monster.grid.dup
+    @monster.rotate_ccw
+    v4 = @monster.grid.dup
+    @monster.flip_y
+    v5 = @monster.grid.dup
+    @monster.rotate_ccw
+    v6 = @monster.grid.dup
+    @monster.rotate_ccw
+    v7 = @monster.grid.dup
+    @monster.rotate_ccw
+    v8 = @monster.grid.dup
 
     [v1, v2, v3, v4, v5, v6, v7, v8]
   end
 
   def size
-    @monster.join.chars.count { |char| char == '#' }
-  end
-
-  private
-
-  def rotate_cw
-    y = @monster.size
-    x = @monster[0].size
-
-    @monster = x.times.map do |xi|
-      y.times.map do |yi|
-        yi = y - yi - 1
-        @monster[yi][xi]
-      end.join
-    end
-  end
-
-  def flip_x
-    @monster.reverse!
+    @input.join.chars.count { |char| char == '#' }
   end
 end
 
@@ -263,7 +251,6 @@ class Program
       @image.each_cons(y) do |ys|
         x_cons.times do |xi|
           viewport = ys.map { |yi| yi[xi, x] }
-
           count += 1 if viewport.join =~ /#{variation.join}/
         end
       end
