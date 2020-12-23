@@ -1,61 +1,59 @@
 # Revised implementation for Part 2 using linked list.
 
 class Num
-  attr_accessor *%i[cur nex pre]
+  attr_accessor *%i[val nex pre]
 
-  def initialize(cur, nex, pre)
-    @cur = cur
-    @nex = nex
-    @pre = pre
+  def initialize(val)
+    @val = val
+    @nex = nil
+    @pre = nil
+  end
+
+  def link(nex)
+    self.nex = nex
+    nex.pre = self
+  end
+
+  def debug
+    [val, nex&.val, pre&.val]
   end
 end
 
 class Program
-  def initialize(input, size_override = nil)
+  def initialize(input)
     @input = input
 
-    nums = input.split('').map(&:to_i)
-    @size = size_override || nums.size
-    @nums = Array.new(@size + 1) # Add 1 b/c input numbers start at 1.
-    nums.each.with_index do |num, i|
-      @nums[num] = Num.new(num, nums[(i + 1) % @size], nums[i - 1])
+    vals = input.split('').map(&:to_i)
+    @nums = Array.new(vals.size + 1) # Add 1 b/c input numbers start at 1.
+    vals.each.with_index do |val, i|
+      @nums[val] = Num.new(val)
+      @nums[vals[i - 1]].link(@nums[val]) if @nums[vals[i - 1]]
     end
+    @nums[vals.last].link(@nums[vals.first])
+    @cur = @nums[vals.first]
+    @max = @nums[vals.size]
 
-    @cur = nums.first
-    @max = nums.max
-  end
-
-  def nex(cur)
-    @nums[cur].nex
+    # @nums.each { |num| p num.debug if num }
   end
 
   def round
-    n1 = nex(@cur)
-    n2 = nex(n1)
-    n3 = nex(n2)
-    n4 = nex(n3)
+    n1 = @cur.nex
+    n2 = n1.nex
+    n3 = n2.nex
     three = [n1, n2, n3]
 
-    @nums[@cur].nex = n4
-    @nums[n1].pre = nil
-    @nums[n3].nex = nil
-    @nums[n4].pre = @cur
+    @cur.link(n3.nex)
 
     dest = @cur
     loop do
-      dest -= 1
-      dest = @max if dest == 0
+      # @nums index 0 is nil and unused.
+      dest = @nums[dest.val - 1] || @max
 
       unless three.include?(dest)
-        dest
-        dest_nex = nex(dest)
+        n3.link(dest.nex)
+        dest.link(n1)
 
-        @nums[dest].nex = n1
-        @nums[n1].pre = dest
-        @nums[n3].nex = dest_nex
-        @nums[dest_nex].pre = n3
-
-        @cur = nex(@cur)
+        @cur = @cur.nex
         break
       end
     end
@@ -67,9 +65,9 @@ class Program
     end
 
     cur = @cur
-    cups = @size.times.map do
-      val = cur
-      cur = nex(cur)
+    cups = @input.size.times.map do
+      val = cur.val
+      cur = cur.nex
       val
     end
 
@@ -78,23 +76,22 @@ class Program
 
   def p2!
     # Insert more numbers up to 1 million.
-    ((@max + 1)..1_000_000).each do |num|
-      @nums[num] = Num.new(num, num + 1, num - 1)
+    ((@max.val + 1)..1_000_000).each do |val|
+      @nums[val] = Num.new(val)
+      @nums[val - 1].link(@nums[val]) if val > @max.val + 1
     end
-    @nums[@nums[@cur].pre].nex = @max + 1
-    @nums[@max + 1].pre = @nums[@cur].pre
-    @nums[1_000_000].nex = @cur
-    @nums[@cur].pre = 1_000_000
-    @max = 1_000_000
+    @cur.pre.link(@nums[@max.val + 1])
+    @max = @nums[1_000_000]
+    @max.link(@cur)
 
     10_000_000.times do |i|
       p i if i % 1_000_000 == 0
       round
     end
 
-    n1 = nex(1)
-    n2 = nex(n1)
-    p [n1, n2, n1 * n2]
+    n1 = @nums[1].nex
+    n2 = n1.nex
+    p [n1.val, n2.val, n1.val * n2.val]
   end
 end
 
@@ -102,5 +99,5 @@ input = '389125467' # Sample
 input = '193467258' # Actual
 program = Program.new(input)
 program.p1!
-program = Program.new(input, 1_000_000)
+program = Program.new(input)
 program.p2!
