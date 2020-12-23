@@ -11,13 +11,14 @@ class Num
 end
 
 class Program
-  def initialize(input)
+  def initialize(input, size_override = nil)
     @input = input
 
-    @nums = {}
     nums = input.split('').map(&:to_i)
+    @size = size_override || nums.size
+    @nums = Array.new(@size + 1) # Add 1 b/c input numbers start at 1.
     nums.each.with_index do |num, i|
-      @nums[num] = Num.new(num, nums[(i + 1) % nums.size], nums[i - 1])
+      @nums[num] = Num.new(num, nums[(i + 1) % @size], nums[i - 1])
     end
 
     @cur = nums.first
@@ -66,7 +67,7 @@ class Program
     end
 
     cur = @cur
-    cups = @nums.size.times.map do
+    cups = @size.times.map do
       val = cur
       cur = nex(cur)
       val
@@ -101,5 +102,5 @@ input = '389125467' # Sample
 input = '193467258' # Actual
 program = Program.new(input)
 program.p1!
-program = Program.new(input)
+program = Program.new(input, 1_000_000)
 program.p2!
