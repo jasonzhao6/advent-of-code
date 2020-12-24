@@ -6,36 +6,24 @@ class Program
     @next = {}
   end
 
-  def parse(line)
-    x = 0
-    y = 0
+  # Use complex numbers as a tuple to store x and y as `x + yi`.
+  COMPLEX_NUMS = {
+    'se' => 1 - 1i,
+    'sw' => -1 - 1i,
+    'ne' => 1 + 1i,
+    'nw' => -1 + 1i,
+    # Replace single-letter directions last to avoid misinterpreting double-letter ones.
+    'e' => 2,
+    'w' => -2,
+  }
 
-    # e, se/a, sw/b, w, nw/c, ne/d;
-    line = line.gsub('se', 'a').gsub('sw', 'b').gsub('nw', 'c').gsub('ne', 'd')
-    line.split('').each do |char|
-      case char
-      when 'e'
-        x += 1
-      when 'a'
-        x += 0.5
-        y -= 0.5
-      when 'b'
-        x -= 0.5
-        y -= 0.5
-      when 'w'
-        x -= 1
-      when 'c'
-        x -= 0.5
-        y += 0.5
-      when 'd'
-        x += 0.5
-        y += 0.5
-      else
-        raise '!'
-      end
+  def parse(line)
+    COMPLEX_NUMS.each do |direction, num|
+      line.gsub!(direction, "#{num} +")
     end
 
-    @curr[[x, y]] = !@curr[[x, y]]
+    xy = eval("#{line} 0")
+    @curr[xy] = !@curr[xy]
   end
 
   def p1
@@ -47,15 +35,7 @@ class Program
   end
 
   def nbors(xy)
-    x, y = xy
-    [
-      [x + 1, y],
-      [x + 0.5, y - 0.5],
-      [x - 0.5, y - 0.5],
-      [x - 1, y],
-      [x - 0.5, y + 0.5],
-      [x + 0.5, y + 0.5]
-    ]
+    COMPLEX_NUMS.values.map { |value| xy + value }
   end
 
   def tile(xy)
