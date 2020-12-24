@@ -1,20 +1,9 @@
-require 'set'
-
 class Program
   def initialize(input)
     @input = input
 
-    @hashes = [{}, {}]
-    @toggle = true
-    @memo = Set.new
-  end
-
-  def cur
-    @toggle ? @hashes[0] : @hashes[1]
-  end
-
-  def nex
-    @toggle ? @hashes[1] : @hashes[0]
+    @curr = {}
+    @next = {}
   end
 
   def parse(line)
@@ -46,7 +35,7 @@ class Program
       end
     end
 
-    cur[[x, y]] = !cur[[x, y]]
+    @curr[[x, y]] = !@curr[[x, y]]
   end
 
   def p1
@@ -54,7 +43,7 @@ class Program
       parse(line)
     end
 
-    p cur.values.count { |value| value }
+    p @curr.values.count { |value| value }
   end
 
   def nbors(xy)
@@ -70,30 +59,20 @@ class Program
   end
 
   def tile(xy)
-    return if @memo.include?(xy)
+    return if @next[xy]
 
-    vals = nbors(xy).map { |xy| cur[xy] }
+    vals = nbors(xy).map { |xy| @curr[xy] }
     count = vals.count { |value| value }
 
-    if cur[xy]
-      if count == 0 || count > 2
-        nex[xy] = false # white
-      else
-        nex[xy] = true # black
-      end
-    else
-      if count == 2
-        nex[xy] = true # black
-      else
-        nex[xy] = false # white
-      end
+    if @curr[xy] && !(count == 0 || count > 2)
+      @next[xy] = true
+    elsif !@curr[xy] && count == 2
+      @next[xy] = true
     end
-
-    @memo.add(xy)
   end
 
   def round
-    cur.each do |xy, _val|
+    @curr.each do |xy, _val|
       tile(xy)
 
       nbors(xy).each do |xy|
@@ -101,8 +80,8 @@ class Program
       end
     end
 
-    @toggle = !@toggle
-    @memo.clear
+    @curr = @next
+    @next = {}
   end
 
   def p2
@@ -111,7 +90,7 @@ class Program
       round
     end
 
-    p cur.values.count { |value| value }
+    p @curr.values.count { |value| value }
   end
 end
 
