@@ -19,15 +19,19 @@ func main() {
 	solve2(lines)
 }
 
+func parseNums(line string) []int {
+	n1, _ := Atoi(Trim(line[0:5], " "))
+	n2, _ := Atoi(Trim(line[5:10], " "))
+	n3, _ := Atoi(Trim(line[10:15], " "))
+
+	return []int{n1, n2, n3}
+}
+
 func solve(lines []string) {
 	cnt := 0
 
 	for _, line := range lines {
-		n1, _ := Atoi(Trim(line[0:5], " "))
-		n2, _ := Atoi(Trim(line[5:10], " "))
-		n3, _ := Atoi(Trim(line[10:15], " "))
-
-		nums := []int{n1, n2, n3}
+		nums := parseNums(line)
 		sort.Ints(nums)
 
 		if nums[0]+nums[1] > nums[2] {
@@ -42,11 +46,7 @@ func solve2(lines []string) {
 	var grid [][]int
 
 	for _, line := range lines {
-		n1, _ := Atoi(Trim(line[0:5], " "))
-		n2, _ := Atoi(Trim(line[5:10], " "))
-		n3, _ := Atoi(Trim(line[10:15], " "))
-
-		grid = append(grid, []int{n1, n2, n3})
+		grid = append(grid, parseNums(line))
 	}
 
 	grid = transpose(grid)
