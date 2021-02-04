@@ -19,28 +19,63 @@ func main() {
 	solve(lines)
 }
 
+func solve(lines []string) {
+	// E.g: nzydfxpc-rclop-qwzhpc-qtylyntyr-769[oshgk]
+	regex := MustCompile("(?P<str>[a-z-]+)-(?P<id>[0-9]+)\\[(?P<checksum>[a-z]+)\\]")
+	names := regex.SubexpNames()
+	p1_sum := 0
+	p2_id := 0
+
+	for _, line := range lines {
+		matches := regex.FindStringSubmatch(line)
+		named := make(map[string]string)
+
+		// Get named matches.
+		for i, name := range names {
+			if i != 0 && name != "" {
+				named[name] = matches[i]
+			}
+		}
+
+		if checksum(named["str"]) == named["checksum"] {
+			id, _ := Atoi(named["id"])
+
+			// Part 1
+			p1_sum += id
+
+			// Part 2
+			if HasPrefix(shift(named["str"], id), "north") {
+				p2_id = id
+			}
+		}
+	}
+
+	p(p1_sum)
+	p(p2_id)
+}
+
 type tally struct {
 	chr rune
 	cnt int
 }
 
-func checksum(strs string) string {
-	str := Replace(strs, "-", "", -1)
+func checksum(str string) string {
+	str = Replace(str, "-", "", -1)
 	hsh := make(map[rune]int)
 	arr := []tally{}
 	top5 := make([]rune, 5)
 
-	// Tally chars in the string.
+	// Tally char counts into a hash.
 	for _, chr := range str {
 		hsh[chr]++
 	}
 
-	// Store tallies as an array of structs, so that we can sort it.
+	// Store tally result as an array of structs, so that we can sort them.
 	for k, v := range hsh {
 		arr = append(arr, tally{k, v})
 	}
 
-	// First sort by count, then alphabetically.
+	// Sort tally result by count, tie break by char alphabetically.
 	sort.Slice(arr, func(i, j int) bool {
 		if arr[i].cnt == arr[j].cnt {
 			return arr[i].chr < arr[j].chr
@@ -62,10 +97,10 @@ const ascii_dash rune = 45
 const ascii_space rune = 32
 const alphabet rune = 26
 
-func shift(strs string, key int) string {
-	shifted := make([]rune, len(strs))
+func shift(str string, key int) string {
+	shifted := make([]rune, len(str))
 
-	for i, chr := range strs {
+	for i, chr := range str {
 		if chr == ascii_dash {
 			shifted[i] = ascii_space
 		} else {
@@ -74,42 +109,4 @@ func shift(strs string, key int) string {
 	}
 
 	return string(shifted)
-}
-
-func solve(lines []string) {
-	// E.g: nzydfxpc-rclop-qwzhpc-qtylyntyr-769[oshgk]
-	regex := MustCompile("(?P<strs>[a-z-]+)-(?P<num>[0-9]+)\\[(?P<checksum>[a-z]+)\\]")
-	names := regex.SubexpNames()
-	p1_sum := 0
-	p2_id := 0
-
-	for _, line := range lines {
-		matches := regex.FindStringSubmatch(line)
-		named := make(map[string]string)
-
-		// Get named matches.
-		for i, name := range names {
-			if i != 0 && name != "" {
-				named[name] = matches[i]
-			}
-		}
-
-		num, err := Atoi(named["num"])
-		if err != nil {
-			panic("!")
-		}
-
-		// Part 1
-		if checksum(named["strs"]) == named["checksum"] {
-			p1_sum += num
-		}
-
-		// Part 2
-		if HasPrefix(shift(named["strs"], num), "north") {
-			p2_id = num
-		}
-	}
-
-	p(p1_sum)
-	p(p2_id)
 }
