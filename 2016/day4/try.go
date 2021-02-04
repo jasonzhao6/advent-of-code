@@ -20,19 +20,19 @@ func main() {
 }
 
 type tally struct {
-	chr string
+	chr rune
 	cnt int
 }
 
 func checksum(strs string) string {
 	str := Replace(strs, "-", "", -1)
-	hsh := make(map[string]int)
+	hsh := make(map[rune]int)
 	arr := []tally{}
-	top5 := make([]string, 5)
+	top5 := make([]rune, 5)
 
 	// Tally chars in the string.
 	for _, chr := range str {
-		hsh[string(chr)]++
+		hsh[chr]++
 	}
 
 	// Store tallies as an array of structs, so that we can sort it.
@@ -54,24 +54,26 @@ func checksum(strs string) string {
 		top5[i] = obj.chr
 	}
 
-	return Join(top5, "")
+	return string(top5)
 }
 
-const ascii_a = 97
-const alphabet = 26
+const ascii_a rune = 97
+const ascii_dash rune = 45
+const ascii_space rune = 32
+const alphabet rune = 26
 
 func shift(strs string, key int) string {
-	shifted := make([]string, len(strs))
+	shifted := make([]rune, len(strs))
 
 	for i, chr := range strs {
-		if string(chr) == "-" {
-			shifted[i] = " "
+		if chr == ascii_dash {
+			shifted[i] = ascii_space
 		} else {
-			shifted[i] = string((int(chr)-ascii_a+key)%alphabet + ascii_a)
+			shifted[i] = (chr-ascii_a+rune(key))%alphabet + ascii_a
 		}
 	}
 
-	return Join(shifted, "")
+	return string(shifted)
 }
 
 func solve(lines []string) {
