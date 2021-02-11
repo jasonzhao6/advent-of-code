@@ -51,7 +51,7 @@ func solve2(in string) {
 		}
 
 		pos, err := Atoi(c1)
-		if err == nil && pos >= 0 && pos < LEN && ans[pos] == "" {
+		if err == nil && pos < LEN && ans[pos] == "" {
 			ans[pos] = c2
 			cnt++
 
