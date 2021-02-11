@@ -11,7 +11,7 @@ import (
 var p = Println
 
 const LEN = 8
-const ZEROS = 5
+const ZEROS = "00000"
 
 func main() {
 	in := "cxdnnyjw"
@@ -70,11 +70,9 @@ func extract(in string, num int) (string, string) {
 	bytes := md5.Sum([]byte(str))
 	hsh := hex.EncodeToString(bytes[:])
 
-	for i := 0; i < ZEROS; i++ {
-		if string(hsh[i]) != "0" {
-			return "-", "-"
-		}
+	if HasPrefix(hsh, "00000") {
+		return string(hsh[len(ZEROS)]), string(hsh[len(ZEROS)+1])
+	} else {
+		return "-", "-"
 	}
-
-	return string(hsh[ZEROS]), string(hsh[ZEROS+1])
 }
