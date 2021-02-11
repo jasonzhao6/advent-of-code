@@ -21,58 +21,58 @@ func main() {
 }
 
 func solve(in string) {
-	ans := [LEN]string{}
+	ans := [LEN]byte{}
 
 	idx := 0
-	chr := "-"
+	chr := byte('-')
 	for i := 0; i < LEN; i++ {
-		for chr == "-" {
+		for chr == '-' {
 			chr, _ = extract(in, idx)
 			idx++
 		}
 		ans[i] = chr
-		chr = "-"
+		chr = '-'
 	}
 
-	p(Join(ans[:], ""))
+	p(string(ans[:]))
 }
 
 func solve2(in string) {
-	ans := [LEN]string{}
+	ans := [LEN]byte{}
 
 	idx := 0
 	cnt := 0
-	c1 := "-"
-	c2 := "-"
+	c1 := byte('-')
+	c2 := byte('-')
 	for {
-		for c1 == "-" {
+		for c1 == '-' {
 			c1, c2 = extract(in, idx)
 			idx++
 		}
 
-		pos, err := Atoi(c1)
-		if err == nil && pos < LEN && ans[pos] == "" {
+		pos := c1 - '0'
+		if pos < LEN && ans[pos] == 0 {
 			ans[pos] = c2
 			cnt++
 
 			if cnt == LEN {
-				p(Join(ans[:], ""))
+				p(string(ans[:]))
 				return
 			}
 		}
-		c1 = "-"
+		c1 = '-'
 	}
 }
 
-func extract(in string, num int) (string, string) {
+func extract(in string, num int) (byte, byte) {
 	str := in + Itoa(num)
 
 	bytes := md5.Sum([]byte(str))
 	hsh := hex.EncodeToString(bytes[:])
 
 	if HasPrefix(hsh, "00000") {
-		return string(hsh[len(ZEROS)]), string(hsh[len(ZEROS)+1])
+		return hsh[len(ZEROS)], hsh[len(ZEROS)+1]
 	} else {
-		return "-", "-"
+		return '-', '-'
 	}
 }
