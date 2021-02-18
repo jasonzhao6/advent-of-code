@@ -8,68 +8,75 @@ import (
 
 var p = Println
 
+const ALPHABET_SIZE = 26
+
 func main() {
 	buf, _ := ReadFile("input.txt")
 	str := Trim(string(buf), "\n")
 	lines := Split(str, "\n")
 
-	solve(lines)
-	solve2(lines)
+	p(solve(lines))
+	p(solve2(lines))
 }
 
-func solve(lines []string) {
-	// Map of map to keep track of all counts.
-	m := make(map[int]map[rune]int)
-	for i, _ := range lines[0] {
-		m[i] = make(map[rune]int)
+func solve(lines []string) string {
+	width := len(lines[0])
+
+	// Array of array to keep track of all counts.
+	m := make([][]int, width)
+	for i := 0; i < width; i++ {
+		m[i] = make([]int, ALPHABET_SIZE)
 	}
 
 	// Array to keep track of current winners.
-	a := make([]rune, len(lines[0]))
+	a := make([]rune, width)
 
 	for _, line := range lines {
 		for i, chr := range line {
-			m[i][chr]++
-			cnt := m[i][chr]
+			offset := chr - 'a'
+			m[i][offset]++
+			cnt := m[i][offset]
 
-			if cnt > m[i][a[i]] {
+			if a[i] == 0 || cnt > m[i][a[i]-'a'] {
 				a[i] = chr
 			}
 		}
 	}
 
-	p(string(a))
+	return string(a)
 }
 
-func solve2(lines []string) {
-	// Map of map to keep track of all counts.
-	m := make(map[int]map[rune]int)
-	for i, _ := range lines[0] {
-		m[i] = make(map[rune]int)
+func solve2(lines []string) string {
+	width := len(lines[0])
+
+	// Array of array to keep track of all counts.
+	m := make([][]int, width)
+	for i := 0; i < width; i++ {
+		m[i] = make([]int, ALPHABET_SIZE)
 	}
 
 	// Array to keep track of final winners.
-	a := make([]rune, len(lines[0]))
+	a := make([]rune, width)
 
 	for _, line := range lines {
 		for i, chr := range line {
-			m[i][chr]++
+			m[i][chr-'a']++
 		}
 	}
 
 	for k, v := range m {
-		var winChr rune
+		var winChr int
 		var winCnt int
 
 		for chr, cnt := range v {
-			if winCnt == 0 || winCnt > cnt {
+			if cnt != 0 && (winCnt == 0 || winCnt > cnt) {
 				winCnt = cnt
 				winChr = chr
 			}
 		}
 
-		a[k] = winChr
+		a[k] = rune(winChr) + 'a'
 	}
 
-	p(string(a))
+	return string(a)
 }
