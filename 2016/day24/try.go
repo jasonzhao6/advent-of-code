@@ -100,6 +100,44 @@ func findWeights(lines []string, points []POINT) map[[2]rune]int {
 	return weights
 }
 
+// Shorter, but more expensive solution
+// func findWeight(lines []string, point1 POINT, point2 POINT) int {
+//   xMax := len(lines)
+//   yMax := len(lines[0])
+//
+//   i := 0
+//   queue := []STEP{{point1.xy, 0}}
+//   seen := map[XY]bool{}
+//   for i < len(queue) {
+//     step := queue[i]
+//
+//     if seen[step.xy] == false &&
+//       step.xy.x >= 0 && step.xy.x < xMax &&
+//       step.xy.y >= 0 && step.xy.y < yMax &&
+//       lines[step.xy.x][step.xy.y] != '#' {
+//
+//       if rune(lines[step.xy.x][step.xy.y]) == point2.val {
+//         return step.weight
+//       }
+//
+//       up := XY{step.xy.x - 1, step.xy.y}
+//       queue = append(queue, STEP{up, step.weight + 1})
+//       down := XY{step.xy.x + 1, step.xy.y}
+//       queue = append(queue, STEP{down, step.weight + 1})
+//       left := XY{step.xy.x, step.xy.y - 1}
+//       queue = append(queue, STEP{left, step.weight + 1})
+//       right := XY{step.xy.x, step.xy.y + 1}
+//       queue = append(queue, STEP{right, step.weight + 1})
+//
+//       seen[step.xy] = true
+//     }
+//
+//     i++
+//   }
+//
+//   panic("!")
+// }
+
 func findWeight(lines []string, point1 POINT, point2 POINT) int {
 	xMax := len(lines)
 	yMax := len(lines[0])
