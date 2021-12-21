@@ -1,11 +1,13 @@
+package day04;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Try {
-    static final String filename = "input.txt";
+public class Day04 {
+    static final String filename = "src/day04/input.txt";
 
     static void p(Object... objects) {
         boolean isFirst = false;
@@ -31,7 +33,7 @@ public class Try {
 
     static List<String> readLines() {
         try {
-            return Files.readAllLines(Paths.get(Try.filename));
+            return Files.readAllLines(Paths.get(Day04.filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,8 +44,7 @@ public class Try {
 
         // Parse numbers drawn, which is on line 1
         List<Integer> numbers = Arrays
-                .asList(lines.get(0).split(","))
-                .stream()
+                .stream(lines.get(0).split(","))
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 

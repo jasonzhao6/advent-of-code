@@ -1,11 +1,13 @@
+package day03;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-public class Try {
-    static final String filename = "input.txt";
+public class Day03 {
+    static final String filename = "src/day03/input.txt";
 
     static void p(Object... objects) {
         boolean isFirst = false;
@@ -31,7 +33,7 @@ public class Try {
 
     static List<String> readLines() {
         try {
-            return Files.readAllLines(Paths.get(Try.filename));
+            return Files.readAllLines(Paths.get(Day03.filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

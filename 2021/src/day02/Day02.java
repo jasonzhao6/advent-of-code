@@ -1,11 +1,13 @@
+package day02;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-public class Try {
-    static final String filename = "input.txt";
+public class Day02 {
+    static final String filename = "src/day02/input.txt";
 
     static void p(Object... objects) {
         boolean isFirst = false;
@@ -31,7 +33,7 @@ public class Try {
 
     static List<String> readLines() {
         try {
-            return Files.readAllLines(Paths.get(Try.filename));
+            return Files.readAllLines(Paths.get(Day02.filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,39 +46,39 @@ public class Try {
     }
 
     public static void part1(List<String> lines) {
-        int inc_count = 0;
-        Integer cur_value = null;
+        int position = 0;
+        int depth = 0;
 
         for (String line : lines) {
-            int value = Integer.parseInt(line);
-
-            if (cur_value == null) {
-                cur_value = value;
-                continue;
+            if (line.startsWith("forward")) {
+                position += Integer.parseInt(line.substring(8));
+            } else if (line.startsWith("down")) {
+                depth += Integer.parseInt(line.substring(5));
+            } else if (line.startsWith("up")) {
+                depth -= Integer.parseInt(line.substring(3));
             }
-
-            if (cur_value < value) {
-                inc_count++;
-            }
-
-            cur_value = value;
         }
 
-        p(inc_count);
+        p(position, depth, position * depth);
     }
 
     public static void part2(List<String> lines) {
-        int inc_count = 0;
+        int position = 0;
+        int depth = 0;
+        int aim = 0;
 
-        for (int i = 3; i < lines.size(); i++) {
-            int prev = Integer.parseInt(lines.get(i - 3));
-            int curr = Integer.parseInt(lines.get(i));
-
-            if (prev < curr) {
-                inc_count++;
+        for (String line : lines) {
+            if (line.startsWith("forward")) {
+                int value = Integer.parseInt(line.substring(8));
+                position += value;
+                depth += value * aim;
+            } else if (line.startsWith("down")) {
+                aim += Integer.parseInt(line.substring(5));
+            } else if (line.startsWith("up")) {
+                aim -= Integer.parseInt(line.substring(3));
             }
         }
 
-        p(inc_count);
+        p(position, depth, position * depth);
     }
 }

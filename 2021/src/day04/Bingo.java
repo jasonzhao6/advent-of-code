@@ -1,3 +1,5 @@
+package day04;
+
 public class Bingo {
     public final static int SIZE = 5;
     private final int[][] board;
@@ -23,7 +25,7 @@ public class Bingo {
 
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (marks[i][j] == false) {
+                if (!marks[i][j]) {
                     sum += this.board[i][j];
                 }
             }

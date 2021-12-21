@@ -1,3 +1,5 @@
+package day08;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -47,8 +49,8 @@ Given: 1, 4, 7, 8
 6s: 6 - 5 = 1 segment, 0 - 5 = 2 segments => 0, 6
 */
 
-public class Try {
-    static final String filename = "input.txt";
+public class Day08 {
+    static final String filename = "src/day08/input.txt";
 
     static void p(Object... objects) {
         boolean isFirst = false;
@@ -74,7 +76,7 @@ public class Try {
 
     static List<String> readLines() {
         try {
-            return Files.readAllLines(Paths.get(Try.filename));
+            return Files.readAllLines(Paths.get(Day08.filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,9 +118,9 @@ public class Try {
             String[] inputs = parts[0].split(" ");
             String[] outputs = parts[1].split(" ");
 
-            Map<Integer, Set<String>> digits = new HashMap<Integer, Set<String>>();
-            List<Set<String>> fives = new ArrayList<Set<String>>();
-            List<Set<String>> sixes = new ArrayList<Set<String>>();
+            Map<Integer, Set<String>> digits = new HashMap<>();
+            List<Set<String>> fives = new ArrayList<>();
+            List<Set<String>> sixes = new ArrayList<>();
 
             // Identify by segment count
             for (String input : inputs) {
@@ -140,7 +142,7 @@ public class Try {
             // Identify 3
             // 5s: 5 - 1 = 3 segments => 3
             for (Set<String> digit : fives) {
-                Set<String> copy = new HashSet<String>(digit);
+                Set<String> copy = new HashSet<>(digit);
                 copy.removeAll(digits.get(1));
 
                 if (copy.size() == 3) {
@@ -151,7 +153,7 @@ public class Try {
 
             // Identify 9
             // 3 + 4 = 9
-            Set<String> nine = new HashSet<String>(digits.get(3));
+            Set<String> nine = new HashSet<>(digits.get(3));
             nine.addAll(digits.get(4));
             digits.put(9, nine);
             sixes.remove(nine);
@@ -159,7 +161,7 @@ public class Try {
             // Identify 2, 5
             // 2, 5: 9 - 5 = 1 segment, 9 - 2 = 2 segments => 2, 5
             for (Set<String> digit : fives) {
-                Set<String> copy = new HashSet<String>(digits.get(9));
+                Set<String> copy = new HashSet<>(digits.get(9));
                 copy.removeAll(digit);
 
                 if (copy.size() == 1) {
@@ -172,7 +174,7 @@ public class Try {
             // Identify 0, 6
             // 0, 6: 6 - 5 = 1 segment, 0 - 5 = 2 segment => 0, 6
             for (Set<String> digit : sixes) {
-                Set<String> copy = new HashSet<String>(digit);
+                Set<String> copy = new HashSet<>(digit);
                 copy.removeAll(digits.get(5));
 
                 if (copy.size() == 1) {
